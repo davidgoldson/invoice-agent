@@ -1,0 +1,25 @@
+{
+  "vendor_name": "Maple Leaf Packaging Inc.",
+  "invoice_number": "ML-7782",
+  "invoice_date": "2026-10-09",
+  "po_number": "PO-2026-101",
+  "currency": "CAD",
+  "line_items": [
+    {
+      "description": "Corrugated shipping box 12x9x6",
+      "quantity": 200,
+      "unit_price": 1.85,
+      "amount": 370.0
+    },
+    {
+      "description": "Kraft gift bag, medium",
+      "quantity": 300,
+      "unit_price": 0.92,
+      "amount": 276.0
+    }
+  ],
+  "subtotal": 646.0,
+  "tax": 83.98,
+  "total": 729.98,
+  "bank_account": "118-90235-6"
+}

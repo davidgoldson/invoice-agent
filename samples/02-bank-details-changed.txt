@@ -1,0 +1,17 @@
+MAPLE LEAF PACKAGING INC.
+INVOICE
+Invoice #: ML-7782
+Date: 2026-10-09
+Your PO: PO-2026-101
+
+Bill to: Example Bakery Co., 120 Front St, Toronto ON
+
+  Description                          Qty     Price      Amount
+  Corrugated shipping box 12x9x6         200  @     1.85      370.00
+  Kraft gift bag, medium                 300  @     0.92      276.00
+
+  Subtotal: 646.00
+  HST: 83.98
+  TOTAL DUE (CAD): 729.98
+
+Please remit by EFT to account 118-90235-6.

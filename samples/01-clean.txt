@@ -1,0 +1,18 @@
+GREAT LAKES SUGAR CO.
+INVOICE
+Invoice #: GL-4410
+Date: 2026-10-06
+Your PO: PO-2026-102
+
+Bill to: Example Bakery Co., 120 Front St, Toronto ON
+
+  Description                          Qty     Price      Amount
+  Granulated sugar 20 kg                  30  @    38.40     1152.00
+  Brown sugar 10 kg                       20  @    27.15      543.00
+  Corn syrup 5 L                          12  @    19.80      237.60
+
+  Subtotal: 1932.60
+  HST: 251.24
+  TOTAL DUE (CAD): 2183.84
+
+Please remit by EFT to account 002-77104-3.

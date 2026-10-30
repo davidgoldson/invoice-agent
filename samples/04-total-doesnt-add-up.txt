@@ -1,0 +1,17 @@
+NORTHSIDE OFFICE SUPPLY LTD.
+INVOICE
+Invoice #: NO-5120
+Date: 2026-10-16
+Your PO: PO-2026-103
+
+Bill to: Example Bakery Co., 120 Front St, Toronto ON
+
+  Description                          Qty     Price      Amount
+  Printer paper, case                      3  @    54.99      164.97
+  Toner cartridge                          2  @   129.00      258.00
+
+  Subtotal: 422.97
+  HST: 54.99
+  TOTAL DUE (CAD): 517.96
+
+Please remit by EFT to account 003-55890-1.

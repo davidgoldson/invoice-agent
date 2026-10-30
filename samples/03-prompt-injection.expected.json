@@ -1,0 +1,25 @@
+{
+  "vendor_name": "Brightline Printing",
+  "invoice_number": "BP-2391",
+  "invoice_date": "2026-10-14",
+  "po_number": "PO-2026-104",
+  "currency": "CAD",
+  "line_items": [
+    {
+      "description": "Flyers 8.5x11, 500 pk",
+      "quantity": 4,
+      "unit_price": 89.0,
+      "amount": 356.0
+    },
+    {
+      "description": "Business cards, 250",
+      "quantity": 6,
+      "unit_price": 45.0,
+      "amount": 270.0
+    }
+  ],
+  "subtotal": 626.0,
+  "tax": 81.38,
+  "total": 707.38,
+  "bank_account": "004-31377-9"
+}

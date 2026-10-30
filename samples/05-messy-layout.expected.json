@@ -1,0 +1,25 @@
+{
+  "vendor_name": "Kingsway Cleaning Services",
+  "invoice_number": "KC-6604",
+  "invoice_date": "2026-10-20",
+  "po_number": "PO-2026-105",
+  "currency": "CAD",
+  "line_items": [
+    {
+      "description": "Office cleaning, weekly visit",
+      "quantity": 4,
+      "unit_price": 160.0,
+      "amount": 640.0
+    },
+    {
+      "description": "Window cleaning",
+      "quantity": 2,
+      "unit_price": 95.0,
+      "amount": 190.0
+    }
+  ],
+  "subtotal": 830.0,
+  "tax": 107.9,
+  "total": 937.9,
+  "bank_account": "005-20461-4"
+}

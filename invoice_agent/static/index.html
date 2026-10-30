@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invoice Review</title>
+<style>
+  :root {
+    --bg: #f5f6f4; --surface: #ffffff; --fg: #1d211f; --muted: #5f6762; --line: #dde1dc;
+    --accent: #1f6b52; --accent-fg: #ffffff;
+    --crit: #a3332a; --crit-bg: #fbe7e4; --warn: #8a5a00; --warn-bg: #fbf0d9; --info: #3b5a8c; --info-bg: #e6edf8;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141816; --surface: #1c211e; --fg: #e5e9e6; --muted: #9aa39d; --line: #2c332f;
+      --accent: #5fc39e; --accent-fg: #0f1311;
+      --crit: #f0948a; --crit-bg: #3a1d1a; --warn: #edc06a; --warn-bg: #33280f; --info: #9db9ea; --info-bg: #1d2738;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 system-ui, sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+           padding: 16px 20px; border-bottom: 1px solid var(--line); background: var(--surface); }
+  h1 { font-size: 18px; margin: 0; }
+  .stats { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+  .stats b { color: var(--fg); font-variant-numeric: tabular-nums; }
+  main { display: grid; grid-template-columns: 320px 1fr; gap: 0; min-height: calc(100vh - 66px); }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+  aside { border-right: 1px solid var(--line); background: var(--surface); padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; min-width: 0; }
+  #upload { display: grid; gap: 8px; }
+  #upload input[type=file] { width: 100%; min-width: 0; }
+  section { padding: 20px; min-width: 0; }
+  button, .btn { font: inherit; border-radius: 6px; padding: 7px 12px; border: 1px solid var(--line);
+                 background: var(--surface); color: var(--fg); cursor: pointer; text-decoration: none; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  button.danger { color: var(--crit); }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tabs button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  ul.queue { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  ul.queue li button { width: 100%; text-align: left; display: grid; gap: 2px; }
+  ul.queue li button[aria-current="true"] { border-color: var(--accent); }
+  .row { display: flex; justify-content: space-between; gap: 8px; }
+  .small { font-size: 12px; color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; font-family: var(--mono); }
+  .flag { border-radius: 6px; padding: 8px 10px; display: grid; gap: 2px; }
+  .flag.critical { background: var(--crit-bg); color: var(--crit); }
+  .flag.warning { background: var(--warn-bg); color: var(--warn); }
+  .flag.info { background: var(--info-bg); color: var(--info); }
+  .flag code { font-size: 11px; opacity: .8; }
+  .flags { display: grid; gap: 6px; margin: 12px 0 20px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .tablebox { overflow-x: auto; }
+  .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px 20px; margin-bottom: 18px; }
+  .fields div span { display: block; color: var(--muted); font-size: 12px; }
+  .actions { display: grid; gap: 8px; margin-top: 20px; max-width: 520px; }
+  .actions .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  textarea { width: 100%; min-height: 60px; font: inherit; padding: 8px; border-radius: 6px; border: 1px solid var(--line);
+             background: var(--bg); color: var(--fg); }
+  .empty { color: var(--muted); padding: 30px 0; }
+  .status { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+  #msg { min-height: 20px; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Invoice Review</h1>
+  <div class="stats" id="stats"></div>
+  <a class="btn" href="/export.csv">Export approved (CSV)</a>
+</header>
+<main>
+  <aside>
+    <form id="upload">
+      <label for="file" class="small">Add an invoice (PDF, image or .txt)</label>
+      <input id="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.txt" required>
+      <button class="primary" type="submit">Process invoice</button>
+    </form>
+    <div id="msg" role="status"></div>
+    <div class="tabs" role="toolbar" aria-label="Filter invoices">
+      <button data-status="pending_review" aria-pressed="true">Needs review</button>
+      <button data-status="approved" aria-pressed="false">Approved</button>
+      <button data-status="rejected" aria-pressed="false">Rejected</button>
+    </div>
+    <ul class="queue" id="queue"></ul>
+  </aside>
+  <section id="detail"><p class="empty">Upload an invoice, or pick one from the list.</p></section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "—").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = (n) => n == null ? "—" : Number(n).toLocaleString("en-CA", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+let current = "pending_review", selected = null;
+const sevRank = {critical: 0, warning: 1, info: 2};
+
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.detail || `Request failed (${res.status})`);
+  return body;
+}
+
+async function loadStats() {
+  const m = await api("/metrics");
+  const pct = (x) => x == null ? "—" : Math.round(x * 100) + "%";
+  $("#stats").innerHTML = `<span>Invoices <b>${m.invoices}</b></span>
+    <span>Needs review <b>${m.by_status.pending_review || 0}</b></span>
+    <span>Straight-through <b>${pct(m.straight_through_rate)}</b></span>
+    <span>Avg time <b>${m.avg_latency_ms == null ? "—" : (m.avg_latency_ms / 1000).toFixed(1) + " s"}</b></span>`;
+}
+
+async function loadQueue() {
+  const rows = await api(`/invoices?status=${current}`);
+  $("#queue").innerHTML = rows.length ? rows.map(r => {
+    const worst = r.flags.filter(f => f.severity !== "info").sort((a, b) => sevRank[a.severity] - sevRank[b.severity])[0];
+    return `<li><button data-id="${r.id}" aria-current="${r.id === selected}">
+      <span class="row"><b>${esc(r.vendor_name)}</b><span class="num">${money(r.total)}</span></span>
+      <span class="small">#${esc(r.invoice_number)} · ${esc(r.invoice_date)}</span>
+      ${worst ? `<span class="small" style="color:var(--${worst.severity === "critical" ? "crit" : "warn"})">${esc(worst.code.replaceAll("_", " "))}</span>` : ""}
+    </button></li>`;
+  }).join("") : `<li class="small">Nothing here.</li>`;
+}
+
+async function showInvoice(id) {
+  selected = id;
+  const r = await api(`/invoices/${id}`);
+  const d = r.data;
+  const flags = [...r.flags].sort((a, b) => sevRank[a.severity] - sevRank[b.severity]);
+  $("#detail").innerHTML = `
+    <div class="row"><h2 style="margin:0;font-size:18px">${esc(d.vendor_name)}</h2><span class="status">${esc(r.status.replace("_", " "))}</span></div>
+    <p class="small">Uploaded as ${esc(r.source_filename)} · system recommendation: ${r.decision === "auto_approve" ? "approve" : "review"}</p>
+    <div class="flags">${flags.length ? flags.map(f => `<div class="flag ${f.severity}"><span>${esc(f.message)}</span><code>${f.severity} · ${f.code}</code></div>`).join("") : `<div class="small">No issues found.</div>`}</div>
+    <div class="fields">
+      <div><span>Invoice number</span>${esc(d.invoice_number)}</div>
+      <div><span>Date</span>${esc(d.invoice_date)}</div>
+      <div><span>Purchase order</span>${esc(d.po_number)}</div>
+      <div><span>Payment account</span><span class="num" style="color:var(--fg);font-size:14px">${esc(d.bank_account)}</span></div>
+    </div>
+    <div class="tablebox"><table>
+      <thead><tr><th>Item</th><th>Qty</th><th>Unit price</th><th>Amount</th></tr></thead>
+      <tbody>${d.line_items.map(l => `<tr><td>${esc(l.description)}</td><td class="num">${l.quantity}</td><td class="num">${money(l.unit_price)}</td><td class="num">${money(l.amount)}</td></tr>`).join("")}
+      <tr><td colspan="3">Subtotal</td><td class="num">${money(d.subtotal)}</td></tr>
+      <tr><td colspan="3">Tax</td><td class="num">${money(d.tax)}</td></tr>
+      <tr><td colspan="3"><b>Total ${esc(d.currency || "")}</b></td><td class="num"><b>${money(d.total)}</b></td></tr></tbody>
+    </table></div>
+    ${r.status === "pending_review" ? `
+    <div class="actions">
+      <label for="reason" class="small">Reason (required to reject)</label>
+      <textarea id="reason" placeholder="e.g. Called vendor, bank change confirmed"></textarea>
+      <div class="btns">
+        <button class="primary" id="approve">Approve</button>
+        <button class="danger" id="reject">Reject</button>
+      </div>
+    </div>` : r.reviews.length ? `<p class="small" style="margin-top:16px">Reviewed: ${r.reviews.map(v => `${esc(v.action)}${v.reason ? " — " + esc(v.reason) : ""}`).join("; ")}</p>` : ""}`;
+  if (r.status === "pending_review") {
+    $("#approve").onclick = () => sendReview(id, "approve");
+    $("#reject").onclick = () => sendReview(id, "reject");
+  }
+  loadQueue();
+}
+
+async function sendReview(id, action) {
+  try {
+    await api(`/invoices/${id}/review`, {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({action, reason: $("#reason").value || null})});
+    $("#msg").textContent = action === "approve" ? "Approved." : "Rejected.";
+    await Promise.all([showInvoice(id), loadStats()]);
+  } catch (e) { $("#msg").textContent = e.message; }
+}
+
+$("#upload").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = $("#file").files[0];
+  if (!f) return;
+  const fd = new FormData(); fd.append("file", f);
+  $("#msg").textContent = "Reading the invoice…";
+  try {
+    const r = await api("/invoices", {method: "POST", body: fd});
+    $("#msg").textContent = r.decision === "auto_approve" ? "Processed: no issues, approved." : "Processed: sent for review.";
+    await Promise.all([loadStats(), showInvoice(r.invoice_id)]);
+  } catch (err) { $("#msg").textContent = err.message; }
+});
+
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  current = b.dataset.status;
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  loadQueue();
+}));
+$("#queue").addEventListener("click", (e) => { const b = e.target.closest("button[data-id]"); if (b) showInvoice(Number(b.dataset.id)); });
+
+loadStats(); loadQueue();
+</script>
+</body>
+</html>

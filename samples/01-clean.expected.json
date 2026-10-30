@@ -1,0 +1,31 @@
+{
+  "vendor_name": "Great Lakes Sugar Co.",
+  "invoice_number": "GL-4410",
+  "invoice_date": "2026-10-06",
+  "po_number": "PO-2026-102",
+  "currency": "CAD",
+  "line_items": [
+    {
+      "description": "Granulated sugar 20 kg",
+      "quantity": 30,
+      "unit_price": 38.4,
+      "amount": 1152.0
+    },
+    {
+      "description": "Brown sugar 10 kg",
+      "quantity": 20,
+      "unit_price": 27.15,
+      "amount": 543.0
+    },
+    {
+      "description": "Corn syrup 5 L",
+      "quantity": 12,
+      "unit_price": 19.8,
+      "amount": 237.6
+    }
+  ],
+  "subtotal": 1932.6,
+  "tax": 251.24,
+  "total": 2183.84,
+  "bank_account": "002-77104-3"
+}

@@ -1,0 +1,25 @@
+{
+  "vendor_name": "Northside Office Supply Ltd.",
+  "invoice_number": "NO-5120",
+  "invoice_date": "2026-10-16",
+  "po_number": "PO-2026-103",
+  "currency": "CAD",
+  "line_items": [
+    {
+      "description": "Printer paper, case",
+      "quantity": 3,
+      "unit_price": 54.99,
+      "amount": 164.97
+    },
+    {
+      "description": "Toner cartridge",
+      "quantity": 2,
+      "unit_price": 129.0,
+      "amount": 258.0
+    }
+  ],
+  "subtotal": 422.97,
+  "tax": 54.99,
+  "total": 517.96,
+  "bank_account": "003-55890-1"
+}
